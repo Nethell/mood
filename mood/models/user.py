@@ -18,7 +18,7 @@ ID_MAX = 32
 PSWD_MIN = 6
 PSWD_MAX = 20
 MAIL_MIN = 6                    # I don't know why:(
-Mail_MAX = 320                  # 254(RFC5321)
+MAIL_MAX = 320                  # 254(RFC5321)
 ID_RE = re.compile('^\w[A-Za-z0-9_]*')
 PSWD_RE = re.compile('^[\S]*')
 MAIL_RE = re.compile('^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$',re.IGNORECASE)
@@ -82,7 +82,7 @@ class User(Document):
         'reg_time':datetime.datetime
     }
     validators = {        # Validators of some fields of this Document
-        'account_id': field_validator(id_min, id_max, id_re),
-        'account_pswd': field_validator(pswd_min, pswd_max, pswd_re)
-        'account_mail': field_validator(mail_min, mail_max, mail_re)
+        'account_id': field_validator(ID_MIN, ID_MAX, ID_RE),
+        'account_pswd': field_validator(PSWD_MIN, PSWD_MAX, PSWD_RE)
+        'account_mail': field_validator(MAIL_MIN, MAIL_MAX, MAIL_RE)
     }
