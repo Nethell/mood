@@ -7,7 +7,7 @@
 # | | | | | | (_) | (_) | (_| |_| | | | | | | |
 # |_| |_| |_|\___/ \___/ \__,_(_)_| |_| |_| |_|
 
-"""The model of user's account'"""
+"""The model of users' account"""
 
 import datetime
 import re
@@ -28,37 +28,22 @@ PSWD_RE = re.compile('^[\S]*')
 MAIL_RE = re.compile('^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$', re.IGNORECASE)
 
 
-def field_validator(min_len, max_len, re_obj):
-    """The validator for the fields of document 'User'
-
-    Arguments:
-    - `min_len`: The minimum length of a field
-    - `max_len`: The maximum length of a field
-    - `re_obj` : The format of field
-
-    Returns:
-       A function validate a given value of a field
-       with 'min_len', 'max_len' and the format expressed
-       by the regular object 're_obj'.
+class field_validator(object):
+    """The validator for fields of document 'User'
+    From example of mongokit wiki
     """
-    def validator(value):
-        """Validate the value of a field
+    def __init__(self, min_len, max_len, re_obj):
+        self.min_len = min_len
+        self.max_len = max_len
+        self.formats = re_obj
 
-        Arguments:
-        - `value`: The value of a field
-
-        Returns:
-          Return 'True' if the 'value' is correct and 'False' if not.
-        """
-        if len(value) >= min_len and \
-           len(value) <= max_len and \
-           re_obj.match(value):
+    def __call__(self, value):
+        if len(value) >= self.min_len and \
+           len(value) <= self.max_len and \
+           self.formats.match(value):
             return True
         else:
             raise BadMoodExc(CODE_USER_FIELD_VALIDATE_EXC)
-
-        # why?
-        return validator
 
 
 @conn.register
