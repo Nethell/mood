@@ -11,7 +11,11 @@
 
 import datetime
 import re
-from mongokit import Connection, Document
+from mood.models import conn
+from mood.models import BaseDoc
+from mood.exceptions import BadMoodExc
+from mood.exceptions import CODE_USER_FIELD_VALIDATE_EXC
+
 
 ID_MIN = 4                      # Should these be put in consts.py?
 ID_MAX = 32
@@ -21,25 +25,25 @@ MAIL_MIN = 6                    # I don't know why:(
 MAIL_MAX = 320                  # 254(RFC5321)
 ID_RE = re.compile('^\w[A-Za-z0-9_]*')
 PSWD_RE = re.compile('^[\S]*')
-MAIL_RE = re.compile('^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$',re.IGNORECASE)
+MAIL_RE = re.compile('^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$', re.IGNORECASE)
 
 
 def field_validator(min_len, max_len, re_obj):
     """The validator for the fields of document 'User'
-    
+
     Arguments:
     - `min_len`: The minimum length of a field
     - `max_len`: The maximum length of a field
     - `re_obj` : The format of field
-    
+
     Returns:
-       A function validate a given value of a field 
+       A function validate a given value of a field
        with 'min_len', 'max_len' and the format expressed
        by the regular object 're_obj'.
     """
     def validator(value):
         """Validate the value of a field
-        
+
         Arguments:
         - `value`: The value of a field
 
@@ -51,38 +55,43 @@ def field_validator(min_len, max_len, re_obj):
            re_obj.match(value):
             return True
         else:
-            raise Exception('Wrong length or format')
+            raise BadMoodExc(CODE_USER_FIELD_VALIDATE_EXC)
 
+        # why?
         return validator
-        
 
-class User(Document):
+
+@conn.register
+class User(BaseDoc):
     """Document of a user's account
-    
+
     Fields:
     - account_id: Id of a user
     - account_pswd: Password of a user
     - account_mail: Email of a user
     - nick: Nickname of a user
-    - sex: Female or Male?
+    - sex: Female or Male or something else?
     - desc: Description of a user
     - tags: Tags of a user
     - addr: Address of a user
     - reg_time: Time when a user registers
     """
+
+    __collection__ = "users"
+
     structure = {
         'account_id': basestring,
         'account_pswd': basestring,
         'account_mail': basestring,
-        'nick': unicode,
+        'nick': basestring,
         'sex': basestring,
-        'desc': unicode,
-        'tags': [unicode],
-        'addr': unicode,
-        'reg_time':datetime.datetime
+        'desc': basestring,
+        'tags': [basestring],
+        'addr': basestring,
+        'reg_time': datetime.datetime
     }
     validators = {        # Validators of some fields of this Document
         'account_id': field_validator(ID_MIN, ID_MAX, ID_RE),
-        'account_pswd': field_validator(PSWD_MIN, PSWD_MAX, PSWD_RE)
+        'account_pswd': field_validator(PSWD_MIN, PSWD_MAX, PSWD_RE),
         'account_mail': field_validator(MAIL_MIN, MAIL_MAX, MAIL_RE)
     }
