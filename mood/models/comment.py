@@ -6,3 +6,33 @@
 # | '_ ` _ \ / _ \ / _ \ / _` | |  _| '_ ` _ \
 # | | | | | | (_) | (_) | (_| |_| | | | | | | |
 # |_| |_| |_|\___/ \___/ \__,_(_)_| |_| |_| |_|
+
+"""The model of comments"""
+
+import datetime
+from mood.models import conn
+from mood.models import BaseDoc
+from mood.models import User
+from mood.models import Story
+
+
+@conn.register
+class Comment(BaseDoc):
+    """Document of a users' comments
+    Fields:
+    - user: The one who posts this comment
+    - story: The story this comment follow
+    - content: The content of this comment
+    - post_time: The time when this comment be posted
+    """
+
+    __collection__ = "comments"
+
+    structure = {
+        'user': User,
+        'story': Story,
+        'content': unicode,
+        'post_time': datetime.datetime
+    }
+
+    use_autorefs = True
