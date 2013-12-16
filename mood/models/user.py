@@ -48,27 +48,14 @@ class field_validator(object):
 
 @conn.register
 class User(BaseDoc):
-    """Document of a user's account
-
-    Fields:
-    - account_id: Id of a user
-    - account_pswd: Password of a user
-    - account_mail: Email of a user
-    - nick: Nickname of a user
-    - sex: Female or Male or something else?
-    - desc: Description of a user
-    - tags: Tags of a user
-    - addr: Address of a user
-    - reg_time: Time when a user registers
-    """
+    """Document of a user's account"""
 
     __collection__ = "users"
 
     structure = {
-        'account_id': basestring,
-        'account_pswd': basestring,
-        'account_mail': basestring,
-        'nick': basestring,
+        'passwd': basestring,
+        'email': basestring,
+        'nickname': basestring,
         'sex': basestring,
         'desc': basestring,
         'tags': [basestring],
@@ -76,7 +63,6 @@ class User(BaseDoc):
         'reg_time': datetime.datetime
     }
     validators = {        # Validators of some fields of this Document
-        'account_id': field_validator(ID_MIN, ID_MAX, ID_RE),
         'account_pswd': field_validator(PSWD_MIN, PSWD_MAX, PSWD_RE),
         'account_mail': field_validator(MAIL_MIN, MAIL_MAX, MAIL_RE)
     }

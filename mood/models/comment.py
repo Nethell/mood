@@ -19,6 +19,7 @@ from mood.models import Story
 @conn.register
 class Comment(BaseDoc):
     """Document of a users' comments
+
     Fields:
     - user: The one who posts this comment
     - story: The story this comment follow
