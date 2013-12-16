@@ -17,18 +17,15 @@ from mood.exceptions import BadMoodExc
 from mood.exceptions import CODE_USER_FIELD_VALIDATE_EXC
 
 
-ID_MIN = 4                      # Should these be put in consts.py?
-ID_MAX = 32
 PSWD_MIN = 6
 PSWD_MAX = 20
 MAIL_MIN = 6                    # I don't know why:(
 MAIL_MAX = 320                  # 254(RFC5321)
-ID_RE = re.compile('^\w[A-Za-z0-9_]*')
-PSWD_RE = re.compile('^[\S]*')
-MAIL_RE = re.compile('^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$', re.IGNORECASE)
+PSWD_RE = re.compile(r'^[\S]*')
+MAIL_RE = re.compile(r'^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$', re.IGNORECASE)
 
 
-class field_validator(object):
+class FieldValidator(object):
     """The validator for fields of document 'User'
     From example of mongokit wiki
     """
@@ -62,7 +59,17 @@ class User(BaseDoc):
         'addr': basestring,
         'reg_time': datetime.datetime
     }
+
+    required = ['password', 'mail', 'nick', 'reg_time']
+
+    default_values = {
+        'sex': 'female',
+        'desc': '文艺青年',
+        'tags': ['文艺青年'],
+        'addr': '中国'
+    }
+
     validators = {        # Validators of some fields of this Document
-        'account_pswd': field_validator(PSWD_MIN, PSWD_MAX, PSWD_RE),
-        'account_mail': field_validator(MAIL_MIN, MAIL_MAX, MAIL_RE)
+        'password': FieldValidator(PSWD_MIN, PSWD_MAX, PSWD_RE),
+        'mail': FieldValidator(MAIL_MIN, MAIL_MAX, MAIL_RE)
     }
