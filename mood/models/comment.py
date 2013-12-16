@@ -17,24 +17,23 @@ from mood.models import BaseDoc
 
 @conn.register
 class Comment(BaseDoc):
-    """Document of a users' comments
-
-    Fields:
-    - user: The one who posts this comment
-    - story: The story this comment follow
-    - content: The content of this comment
-    - post_time: The time when this comment be posted
-    """
+    """Document of a users' comments"""
 
     __collection__ = "comments"
 
     structure = {
-        'user': ObjectId,
-        'story': ObjectId,
+        'user_id': ObjectId,
+        # NOTE: image_url should contain into this in some specific structure
         'content': basestring,
-        'post_time': datetime.datetime
+        'post_time': datetime.datetime,
+        'target': {
+            'type': basestring,  # story or comment
+            'id': ObjectId
+        }
     }
 
-    required = ['user', 'story', 'content', 'post_time']
+    default_values = {
+        'post_time': datetime.datetime.utcnow
+    }
 
-    use_autorefs = True
+    required = ['user_id', 'target', 'content']
