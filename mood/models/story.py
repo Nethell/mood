@@ -17,25 +17,25 @@ from mood.models import BaseDoc
 
 @conn.register
 class Story(BaseDoc):
-    """Document of a users' stories
-    Fields:
-    - user: The one who posts this story
-    - scenery: The scenery of this story
-    - tags: Tags attached on this story
-    - content: The content of this story
-    - post_time: The time when this story be posted
-    """
+    """Document of a users' stories"""
 
     __collection__ = "stories"
 
     structure = {
-        'user': ObjectId,
-        'scenery': ObjectId,
-        'tags': [basestring],
+        'user_id': ObjectId,
+        'scenery_id': ObjectId,
         'content': basestring,
-        'post_time': datetime.datetime
+        'brief': basestring,
+        'post_time': datetime.datetime,
+        'count': {
+            'up': int,
+        },
+        'classify': basestring,  # decide by machine or human?
     }
 
-    required = ['user', 'scenery', 'tags', 'content', 'post_time']
+    default_values = {
+        'post_time': datetime.datetime.utcnow,
+        'count.up': 0,
+    }
 
-    use_autorefs = True
+    required = ['user_id', 'scenery_id', 'content']
