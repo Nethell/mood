@@ -6,3 +6,21 @@
 # | '_ ` _ \ / _ \ / _ \ / _` | |  _| '_ ` _ \
 # | | | | | | (_) | (_) | (_| |_| | | | | | | |
 # |_| |_| |_|\___/ \___/ \__,_(_)_| |_| |_| |_|
+
+from bson import ObjectId
+from mood.models import conn
+from mood.models import BaseDoc
+
+
+@conn.register
+class Scenery(BaseDoc):
+    """Document of a users' comments"""
+
+    __collection__ = "sceneries"
+
+    structure = {
+        'name': basestring,
+        'story_id': ObjectId,
+        'url': basestring
+    }
+    required = ['story_id', 'url', 'name']
