@@ -10,10 +10,9 @@
 """The model of comments"""
 
 import datetime
+from bson import ObjectId
 from mood.models import conn
 from mood.models import BaseDoc
-from mood.models import User
-from mood.models import Story
 
 
 @conn.register
@@ -30,10 +29,12 @@ class Comment(BaseDoc):
     __collection__ = "comments"
 
     structure = {
-        'user': User,
-        'story': Story,
-        'content': unicode,
+        'user': ObjectId,
+        'story': ObjectId,
+        'content': basestring,
         'post_time': datetime.datetime
     }
+
+    required = ['user', 'story', 'content', 'post_time']
 
     use_autorefs = True
