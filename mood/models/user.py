@@ -45,28 +45,54 @@ class FieldValidator(object):
 
 @conn.register
 class User(BaseDoc):
-    """Document of a user's account"""
+    """Document of a user's account
+
+    TODO(crow): add some indexes according to queries
+    """
 
     __collection__ = "users"
 
     structure = {
         'passwd': basestring,
         'email': basestring,
-        'nickname': basestring,
-        'sex': basestring,
+        'nickname': basestring,  # NOTE(@linusp): there is no word called 'nick'
+        'sex': basestring,  # m: male, f: female
         'desc': basestring,
-        'tags': [basestring],
-        'addr': basestring,
-        'reg_time': datetime.datetime
+        'medals': [basestring],  # like: 点赞狂魔，发帖狂魔
+        'rep': basestring,  # reputation, 经验值
+        'addr': [
+            {
+                'context': basestring,
+                'loc': [float, float]
+            }
+        ],
+        'reg_time': datetime.datetime,
+        'count': {
+            'stories_passed': int,
+            'stories_denied': int,
+            'sceneries_passed': int,
+            'sceneries_denied': int,
+            'comments_passed': int,
+            'comments_denied': int,
+        },
+        'authority': basestring,  # g: god(admin), h: human(user), b: bug(banned)
+        'avatar': {
+            'big': basestring,
+            'small': basestring
+        }
     }
 
-    required = ['password', 'mail', 'nick', 'reg_time']
+    required = ['password', 'email', 'nick']
 
     default_values = {
-        'sex': 'female',
-        'desc': '文艺青年',
-        'tags': ['文艺青年'],
-        'addr': '中国'
+        'reg_time': datetime.datetime.utcnow,
+        'authority': 'h',
+        'count.stories_passed': 0,
+        'count.stories_denied': 0,
+        'count.sceneries_passed': 0,
+        'count.sceneries_denied': 0,
+        'count.comments_passed': 0,
+        'count.comments_denied': 0,
     }
 
     validators = {        # Validators of some fields of this Document
