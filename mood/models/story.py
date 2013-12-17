@@ -17,7 +17,11 @@ from mood.models import BaseDoc
 
 @conn.register
 class Story(BaseDoc):
-    """Document of a users' stories"""
+    """Document of a users' stories
+
+    用户看了那些景色的文章，再redis中记录用户景物name的关系
+    推荐的时候，推荐这些景色中的文章
+    """
 
     __collection__ = "stories"
 
@@ -28,14 +32,13 @@ class Story(BaseDoc):
         'brief': basestring,
         'post_time': datetime.datetime,
         'count': {
-            'up': int,
+            'collect': int,
         },
-        'classify': basestring,  # decide by machine or human?
     }
 
     default_values = {
         'post_time': datetime.datetime.utcnow,
-        'count.up': 0,
+        'count.collect': 0,
     }
 
     required = ['user_id', 'scenery_id', 'content']
