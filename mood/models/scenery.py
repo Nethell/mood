@@ -23,4 +23,5 @@ class Scenery(BaseDoc):
         'story_id': ObjectId,
         'url': basestring
     }
+
     required = ['story_id', 'url', 'name']
