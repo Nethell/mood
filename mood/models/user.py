@@ -11,6 +11,10 @@
 
 import datetime
 import re
+import logging
+from mood.consts import (
+    USER_AUTHORITY_HUMAN, USER_DEFAULT_DESC,
+)
 from mood.models import conn
 from mood.models import BaseDoc
 from mood.exceptions import BadMoodExc
@@ -56,10 +60,10 @@ class User(BaseDoc):
         'passwd': basestring,
         'email': basestring,
         'nickname': basestring,  # NOTE(@linusp): there is no word called 'nick'
-        'sex': basestring,  # m: male, f: female
+        'sex': int,
         'desc': basestring,
         'medals': [basestring],  # like: 点赞狂魔，发帖狂魔
-        'rep': basestring,  # reputation, 经验值
+        'rep': int,  # reputation, 经验值
         'addr': [
             {
                 'context': basestring,
@@ -75,18 +79,20 @@ class User(BaseDoc):
             'comments_passed': int,
             'comments_denied': int,
         },
-        'authority': basestring,  # g: god(admin), h: human(user), b: bug(banned)
+        'authority': int,
         'avatar': {
             'big': basestring,
             'small': basestring
         }
     }
 
-    required = ['password', 'email', 'nick']
+    required = ['password', 'email', 'nickname', 'sex']
 
     default_values = {
         'reg_time': datetime.datetime.utcnow,
-        'authority': 'h',
+        'desc': USER_DEFAULT_DESC,
+        'rep': 1,
+        'authority': USER_AUTHORITY_HUMAN,
         'count.stories_passed': 0,
         'count.stories_denied': 0,
         'count.sceneries_passed': 0,
@@ -95,7 +101,25 @@ class User(BaseDoc):
         'count.comments_denied': 0,
     }
 
-    validators = {        # Validators of some fields of this Document
-        'password': FieldValidator(PSWD_MIN, PSWD_MAX, PSWD_RE),
-        'mail': FieldValidator(MAIL_MIN, MAIL_MAX, MAIL_RE)
-    }
+    # validators = {        # Validators of some fields of this Document
+    #     'passwd': FieldValidator(PSWD_MIN, PSWD_MAX, PSWD_RE),
+    #     'email': FieldValidator(MAIL_MIN, MAIL_MAX, MAIL_RE)
+    # }
+
+
+logger = logging.getLogger('mood.models')
+
+
+# NOTE: not validate params!!!!
+def create_user(**kwargs):
+    user = conn.User()
+    user['nickname'] = kwargs.get('nickname')
+    user['passwd'] = kwargs.get('passwd')
+    user['email'] = kwargs.get('email')
+    user['sex'] = kwargs.get('sex')
+    user.save()
+    logger.debug("(create_user): {0} become a human".format(user['nickname']))
+
+
+def update_user_authority(self, authority):
+    pass
