@@ -18,11 +18,18 @@ from mood.consts import (
 from mood.models import conn
 from mood.models import BaseDoc
 from mood.exceptions import BadMoodExc
-from mood.exceptions import CODE_USER_FIELD_VALIDATE_EXC
+from mood.consts import (
+    USER_PSWD_MIN,USER_PSWD_MAX,
+)
+from mood.exceptions import (
+    CODE_USER_PASSWD_TOO_SHORT,
+    CODE_USER_PASSWD_TOO_LONG,
+    CODE_USER_PASSWD_WRONG_FORMAT,
+    CODE_USER_BAD_EMAIL,
+    CODE_USER_FIELD_VALIDATE_EXC,
+)
 
 
-PSWD_MIN = 6
-PSWD_MAX = 20
 MAIL_MIN = 6                    # I don't know why:(
 MAIL_MAX = 320                  # 254(RFC5321)
 PSWD_RE = re.compile(r'^[\S]*')
@@ -39,10 +46,23 @@ class FieldValidator(object):
         self.formats = re_obj
 
     def __call__(self, value):
-        if len(value) >= self.min_len and \
-           len(value) <= self.max_len and \
-           self.formats.match(value):
-            return True
+        if self.formats == PSWD_RE:
+            if len(value) < self.min_len:
+                raise BadMoodExc(CODE_USER_PASSWD_TOO_SHORT)
+            elif len(value) > self.max_len:
+                raise BadMoodExc(CODE_USER_PASSWD_TOO_LONG)
+            elif not self.formats.match(value):
+                raise BadMoodExc(CODE_USER_PASSWD_WRONG_FORMAT)
+            else:
+                return True
+
+        elif self.formats == MAIL_RE:
+            if len(value) >= self.min_len and \
+               len(value) <= self.max_len and \
+               self.formats.match(value):
+                return True
+            else:
+                raise BadMoodExc(CODE_USER_BAD_EMAIL)
         else:
             raise BadMoodExc(CODE_USER_FIELD_VALIDATE_EXC)
 
@@ -59,11 +79,11 @@ class User(BaseDoc):
     structure = {
         'passwd': basestring,
         'email': basestring,
-        'nickname': basestring,  # NOTE(@linusp): there is no word called 'nick'
+        'nickname': basestring,
         'sex': int,
         'desc': basestring,
         'medals': [basestring],  # like: 点赞狂魔，发帖狂魔
-        'rep': int,  # reputation, 经验值
+        'rep': int,              # reputation, 经验值
         'addr': [
             {
                 'context': basestring,
@@ -86,7 +106,7 @@ class User(BaseDoc):
         }
     }
 
-    required = ['password', 'email', 'nickname', 'sex']
+    required_fields = ['passwd', 'email', 'nickname', 'sex']
 
     default_values = {
         'reg_time': datetime.datetime.utcnow,
@@ -101,10 +121,10 @@ class User(BaseDoc):
         'count.comments_denied': 0,
     }
 
-    # validators = {        # Validators of some fields of this Document
-    #     'passwd': FieldValidator(PSWD_MIN, PSWD_MAX, PSWD_RE),
-    #     'email': FieldValidator(MAIL_MIN, MAIL_MAX, MAIL_RE)
-    # }
+    validators = {        # Validators of some fields of this Document
+        'passwd': FieldValidator(USER_PSWD_MIN, USER_PSWD_MAX, PSWD_RE),
+        'email': FieldValidator(MAIL_MIN, MAIL_MAX, MAIL_RE)
+    }
 
 
 logger = logging.getLogger('mood.models')

@@ -36,4 +36,4 @@ class Comment(BaseDoc):
         'post_time': datetime.datetime.utcnow
     }
 
-    required = ['user_id', 'target', 'content']
+    required_fields = ['user_id', 'target', 'content']
