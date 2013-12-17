@@ -14,7 +14,7 @@ from mood.models import BaseDoc
 
 @conn.register
 class Scenery(BaseDoc):
-    """Document of a users' comments"""
+    """Document of a stoies' sceneries"""
 
     __collection__ = "sceneries"
 
@@ -24,4 +24,4 @@ class Scenery(BaseDoc):
         'url': basestring
     }
 
-    required = ['story_id', 'url', 'name']
+    required_fields = ['story_id', 'url', 'name']

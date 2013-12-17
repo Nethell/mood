@@ -19,7 +19,7 @@ from mood.models import BaseDoc
 class Story(BaseDoc):
     """Document of a users' stories
 
-    用户看了那些景色的文章，再redis中记录用户景物name的关系
+    用户看了那些景色的文章，在redis中记录用户景物name的关系
     推荐的时候，推荐这些景色中的文章
     """
 
@@ -41,4 +41,4 @@ class Story(BaseDoc):
         'count.collect': 0,
     }
 
-    required = ['user_id', 'scenery_id', 'content']
+    required_fields = ['user_id', 'scenery_id', 'content']
