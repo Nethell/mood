@@ -12,6 +12,7 @@
 import datetime
 import re
 import logging
+from bson import ObjectId
 from mood.consts import (
     USER_AUTHORITY_HUMAN, USER_DEFAULT_DESC,
 )
@@ -19,7 +20,7 @@ from mood.models import conn
 from mood.models import BaseDoc
 from mood.exceptions import BadMoodExc
 from mood.consts import (
-    USER_PSWD_MIN,USER_PSWD_MAX,
+    USER_PSWD_MIN, USER_PSWD_MAX,
 )
 from mood.exceptions import (
     CODE_USER_PASSWD_TOO_SHORT,
@@ -82,8 +83,11 @@ class User(BaseDoc):
         'nickname': basestring,
         'sex': int,
         'desc': basestring,
-        'medals': [basestring],  # like: 点赞狂魔，发帖狂魔
+        # we don't need medals
+        # 'medals': [basestring],  # like: 点赞狂魔，发帖狂魔
+        # this can be used for audit
         'rep': int,              # reputation, 经验值
+        # what for? @linusp
         'addr': [
             {
                 'context': basestring,
@@ -92,18 +96,27 @@ class User(BaseDoc):
         ],
         'reg_time': datetime.datetime,
         'count': {
-            'stories_passed': int,
-            'stories_denied': int,
-            'sceneries_passed': int,
-            'sceneries_denied': int,
-            'comments_passed': int,
-            'comments_denied': int,
+            'audit': {
+                'stories_passed': int,
+                'stories_denied': int,
+                'sceneries_passed': int,
+                'sceneries_denied': int,
+                'comments_passed': int,
+                'comments_denied': int,
+            },
+            'like': int,
+            'follow': int,
+            'be_followed': int,
         },
         'authority': int,
         'avatar': {
             'big': basestring,
             'small': basestring
-        }
+        },
+        # there's a problem if the list is too long
+        'follow_ids': [ObjectId],
+        'like_ids': [ObjectId],
+        'collect_ids': [ObjectId]
     }
 
     required_fields = ['passwd', 'email', 'nickname', 'sex']
@@ -113,12 +126,15 @@ class User(BaseDoc):
         'desc': USER_DEFAULT_DESC,
         'rep': 1,
         'authority': USER_AUTHORITY_HUMAN,
-        'count.stories_passed': 0,
-        'count.stories_denied': 0,
-        'count.sceneries_passed': 0,
-        'count.sceneries_denied': 0,
-        'count.comments_passed': 0,
-        'count.comments_denied': 0,
+        'count.audit.stories_passed': 0,
+        'count.audit.stories_denied': 0,
+        'count.audit.sceneries_passed': 0,
+        'count.audit.sceneries_denied': 0,
+        'count.audit.comments_passed': 0,
+        'count.audit.comments_denied': 0,
+        'count.like': 0,
+        'count.follow': 0,
+        'count.be_followed': 0,
     }
 
     validators = {        # Validators of some fields of this Document
